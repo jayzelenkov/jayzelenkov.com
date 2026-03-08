@@ -1,0 +1,19 @@
+---
+layout: base.njk
+---
+<section class="intro">
+  <h2>Hello!</h2>
+  <p>I'm Jay, founding engineer at a medtech startup MaxAI, helping reduce medical costs and improve patient outcomes through agentic AI automation.</p>
+  <p>I am originally from Estonia 🇪🇪 and currently based in San Francisco 🌁.</p>
+  <p>Get in touch via <a href="mailto:jay@jayzelenkov.com">email</a> or connect with me on <a href="https://www.linkedin.com/in/jayzelenkov">LinkedIn</a>. You can also check out what I'm up to <a href="/now/">now</a> or subscribe via <a href="/feed.xml">RSS</a>.</p>
+</section>
+
+<h2 class="post-list-heading">Updates</h2>
+<ul class="post-list">
+  {% for post in collections.posts %}
+  <li>
+    <span class="post-list-date">{{ post.date | dateDisplay }}</span>
+    <a href="{{ post.url }}">{{ post.data.title }}</a>
+  </li>
+  {% endfor %}
+</ul>

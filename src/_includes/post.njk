@@ -1,0 +1,22 @@
+---
+layout: base.njk
+---
+<article>
+  <h1 class="post-title">{{ title }}</h1>
+  <p class="post-date">{{ date | dateDisplay }}</p>
+
+  <div class="post-content">
+    {{ content | safe }}
+  </div>
+
+  {% set prevPost = collections.posts | getPrevPost(page.url) %}
+  {% set nextPost = collections.posts | getNextPost(page.url) %}
+  {% if prevPost or nextPost %}
+  <nav class="post-nav">
+    <span>{% if prevPost %}<a href="{{ prevPost.url }}">← {{ prevPost.data.title }}</a>{% endif %}</span>
+    <span>{% if nextPost %}<a href="{{ nextPost.url }}">{{ nextPost.data.title }} →</a>{% endif %}</span>
+  </nav>
+  {% endif %}
+
+  <p class="back-home"><a href="/">← Back home</a></p>
+</article>

@@ -1,0 +1,257 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  background: #fff;
+  color: #000;
+  font-family: Merriweather, Georgia, serif;
+  font-weight: 300;
+  font-size: 1.05rem;
+  line-height: 1.9;
+  margin: 0;
+}
+
+::selection {
+  background: #000;
+  color: #fff;
+}
+
+/* ── Main container ── */
+
+main {
+  max-width: 680px;
+  padding: 3rem 1.5rem 5rem;
+  margin-left: max(1.5rem, calc((100% - 680px) / 3));
+}
+
+/* ── Homepage ── */
+
+.intro {
+  margin-bottom: 2.5rem;
+}
+
+.intro h2 {
+  font-family: Montserrat, sans-serif;
+  font-size: 1.5rem;
+  color: #000;
+  margin: 0 0 0.75rem;
+}
+
+.intro p {
+  margin: 0.5rem 0;
+  color: #000;
+}
+
+.intro a {
+  color: #000;
+  text-decoration: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q50 3 100 7' fill='none' stroke='%23999' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 6px;
+  padding-bottom: 4px;
+}
+
+.intro a:hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q50 3 100 7' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");
+}
+
+.post-list-heading {
+  font-family: Montserrat, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 2rem 0 0.75rem;
+}
+
+.post-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.post-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  padding: 0.35rem 0;
+}
+
+.post-list-date {
+  font-size: 0.85rem;
+  color: #777;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 6.5rem;
+  text-align: right;
+}
+
+.post-list a {
+  color: #000;
+  font-weight: 400;
+  text-decoration: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q50 -2 100 7' fill='none' stroke='%23ccc' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 6px;
+  padding-bottom: 4px;
+}
+
+.post-list a:hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q50 -2 100 7' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");
+}
+
+/* ── Post ── */
+
+.post-title {
+  font-family: Montserrat, sans-serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #000;
+  text-transform: uppercase;
+  line-height: 1.2;
+  margin: 0 0 0.5rem;
+}
+
+.post-date {
+  font-family: Montserrat, sans-serif;
+  font-size: 0.8rem;
+  color: #777;
+  margin: 0 0 2.5rem;
+}
+
+.post-content h2,
+.post-content h3,
+.post-content h4 {
+  font-family: Montserrat, sans-serif;
+  margin-top: 2.5rem;
+}
+
+.post-content a {
+  color: #000;
+  font-weight: 400;
+  text-decoration: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q50 3 100 7' fill='none' stroke='%23999' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 6px;
+  padding-bottom: 4px;
+}
+
+.post-content a:hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q50 3 100 7' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");
+}
+
+.post-content blockquote {
+  margin: 2rem 0;
+  padding: 1rem 1.5rem;
+  background: #f5f5f5;
+  border-left: 4px solid #000;
+  font-style: italic;
+}
+
+.post-content blockquote p {
+  margin: 0;
+}
+
+.post-content img {
+  display: block;
+  margin: 2rem auto;
+  max-width: 100%;
+  border: 1px solid #eee;
+}
+
+.post-content code {
+  background: #f5f5f5;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.post-content pre {
+  background: #f5f5f5;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  border-radius: 3px;
+}
+
+.post-content pre code {
+  background: none;
+  padding: 0;
+}
+
+/* ── Post navigation ── */
+
+.post-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #ddd;
+  font-family: Montserrat, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.post-nav a {
+  color: #000;
+  text-decoration: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q50 3 100 7' fill='none' stroke='%23999' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 6px;
+  padding-bottom: 4px;
+}
+
+.post-nav a:hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q50 3 100 7' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");
+}
+
+.back-home {
+  margin-top: 1.5rem;
+  font-family: Montserrat, sans-serif;
+  font-size: 0.85rem;
+}
+
+.back-home a {
+  color: #777;
+  text-decoration: none;
+}
+
+.back-home a:hover {
+  color: #000;
+}
+
+/* ── Static pages (about, now) ── */
+
+.page-title {
+  font-family: Montserrat, sans-serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #000;
+  text-transform: uppercase;
+  line-height: 1.2;
+  margin: 0 0 0.5rem;
+}
+
+.page-meta {
+  font-family: Montserrat, sans-serif;
+  font-size: 0.8rem;
+  color: #777;
+  margin: 0 0 2.5rem;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 600px) {
+  .post-title {
+    font-size: 1.6rem;
+  }
+
+  .post-list li {
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+}

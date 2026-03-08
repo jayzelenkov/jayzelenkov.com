@@ -1,0 +1,25 @@
+{
+  "name": "jayzelenkov.com",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "eleventy --serve",
+    "build": "eleventy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jayzelenkov/jayzelenkov.com.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jayzelenkov/jayzelenkov.com/issues"
+  },
+  "homepage": "https://github.com/jayzelenkov/jayzelenkov.com#readme",
+  "dependencies": {
+    "@11ty/eleventy": "^3.1.2"
+  }
+}
