@@ -1,6 +1,8 @@
 # jayzelenkov.com
 
-Personal blog built with [Eleventy](https://www.11ty.dev/).
+[![Deploy to GitHub Pages](https://github.com/jayzelenkov/jayzelenkov.com/actions/workflows/deploy.yml/badge.svg)](https://github.com/jayzelenkov/jayzelenkov.com/actions/workflows/deploy.yml)
+
+Personal blog built with [Eleventy](https://www.11ty.dev/). Hosted on [GitHub Pages](https://pages.github.com/).
 
 ## Setup
 
