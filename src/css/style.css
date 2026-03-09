@@ -255,3 +255,87 @@ main {
     gap: 0.15rem;
   }
 }
+
+/* ── Dark mode ── */
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #111;
+    color: #e0e0e0;
+  }
+
+  ::selection {
+    background: #e0e0e0;
+    color: #111;
+  }
+
+  .intro h2,
+  .intro p,
+  .post-list-heading,
+  .post-title,
+  .page-title {
+    color: #e0e0e0;
+  }
+
+  .post-list-date,
+  .post-date,
+  .page-meta {
+    color: #888;
+  }
+
+  .intro a,
+  .post-list a,
+  .post-content a,
+  .post-nav a {
+    color: #e0e0e0;
+  }
+
+  .intro a,
+  .post-content a,
+  .post-nav a {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q50 3 100 7' fill='none' stroke='%23666' stroke-width='1.5'/%3E%3C/svg%3E");
+  }
+
+  .intro a:hover,
+  .post-content a:hover,
+  .post-nav a:hover {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q50 3 100 7' fill='none' stroke='%23e0e0e0' stroke-width='1.5'/%3E%3C/svg%3E");
+  }
+
+  .post-list a {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q50 -2 100 7' fill='none' stroke='%23444' stroke-width='1.5'/%3E%3C/svg%3E");
+  }
+
+  .post-list a:hover {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M0 7 Q50 -2 100 7' fill='none' stroke='%23e0e0e0' stroke-width='1.5'/%3E%3C/svg%3E");
+  }
+
+  .back-home a {
+    color: #888;
+  }
+
+  .back-home a:hover {
+    color: #e0e0e0;
+  }
+
+  .post-content blockquote {
+    background: #1a1a1a;
+    border-left-color: #e0e0e0;
+  }
+
+  .post-content img {
+    border-color: #333;
+  }
+
+  .post-content code {
+    background: #1a1a1a;
+  }
+
+  .post-content pre {
+    background: #1a1a1a;
+  }
+
+  .post-nav {
+    border-top-color: #333;
+  }
+}
