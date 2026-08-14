@@ -1,8 +1,8 @@
 # jayzelenkov.com
 
-[![Deploy to GitHub Pages](https://github.com/jayzelenkov/jayzelenkov.com/actions/workflows/deploy.yml/badge.svg)](https://github.com/jayzelenkov/jayzelenkov.com/actions/workflows/deploy.yml)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/c9f52694-c4bd-46cc-b896-bbca99ecc2b5/deploy-status)](https://app.netlify.com/projects/jayzelenkov/deploys)
 
-Personal blog built with [Eleventy](https://www.11ty.dev/). Hosted on [GitHub Pages](https://pages.github.com/).
+Personal blog built with [Eleventy](https://www.11ty.dev/). Hosted on [Netlify](https://www.netlify.com/).
 
 ## Setup
 
