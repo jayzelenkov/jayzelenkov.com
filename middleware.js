@@ -165,29 +165,11 @@ async function updateDuration(supabase, pageviewId, durationMs) {
 
   for (let attempt = 0; attempt < 4; attempt++) {
     try {
-      const response = await fetch(
-        `${supabase.url}/rest/v1/pageviews?pageview_id=eq.${pageviewId}&or=(duration_ms.is.null,duration_ms.lt.${durationMs})`,
-        {
-          method: "PATCH",
-          headers: {
-            ...supabase.headers,
-            Prefer: "return=representation",
-          },
-          body: JSON.stringify({ duration_ms: durationMs }),
-        }
-      );
-
-      if (!response.ok) {
-        console.error(
-          "pageview duration update failed",
-          response.status,
-          await response.text()
-        );
+      const patched = await patchDuration(supabase, pageviewId, durationMs);
+      if (patched) {
         return;
       }
-
-      const rows = await response.json();
-      if (Array.isArray(rows) && rows.length > 0) {
+      if (await pageviewExists(supabase, pageviewId)) {
         return;
       }
     } catch (error) {
@@ -197,6 +179,51 @@ async function updateDuration(supabase, pageviewId, durationMs) {
 
     await new Promise((resolve) => setTimeout(resolve, 200 * (attempt + 1)));
   }
+}
+
+async function patchDuration(supabase, pageviewId, durationMs) {
+  const response = await fetch(
+    `${supabase.url}/rest/v1/pageviews?pageview_id=eq.${pageviewId}&or=(duration_ms.is.null,duration_ms.lt.${durationMs})`,
+    {
+      method: "PATCH",
+      headers: {
+        ...supabase.headers,
+        Prefer: "return=representation",
+      },
+      body: JSON.stringify({ duration_ms: durationMs }),
+    }
+  );
+
+  if (!response.ok) {
+    console.error(
+      "pageview duration update failed",
+      response.status,
+      await response.text()
+    );
+    return true;
+  }
+
+  const rows = await response.json();
+  return Array.isArray(rows) && rows.length > 0;
+}
+
+async function pageviewExists(supabase, pageviewId) {
+  const response = await fetch(
+    `${supabase.url}/rest/v1/pageviews?pageview_id=eq.${pageviewId}&select=id`,
+    { headers: supabase.headers }
+  );
+
+  if (!response.ok) {
+    console.error(
+      "pageview duration lookup failed",
+      response.status,
+      await response.text()
+    );
+    return true;
+  }
+
+  const rows = await response.json();
+  return Array.isArray(rows) && rows.length > 0;
 }
 
 function supabaseConfig() {

@@ -5,7 +5,6 @@
   var id = readCookie("pv");
   var timer = null;
   var duration = 0;
-  var sent = -1;
   var startAt = 0;
 
   function readCookie(name) {
@@ -49,10 +48,6 @@
     if (visible()) {
       begin();
     }
-    if (!force && ms === sent) {
-      return;
-    }
-    sent = ms;
     var body = JSON.stringify({
       id: pageviewIdValue,
       path: path,
