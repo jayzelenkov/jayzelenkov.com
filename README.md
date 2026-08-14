@@ -1,8 +1,8 @@
 # jayzelenkov.com
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/c9f52694-c4bd-46cc-b896-bbca99ecc2b5/deploy-status)](https://app.netlify.com/projects/jayzelenkov/deploys)
+[![Vercel Status](https://img.shields.io/github/deployments/jayzelenkov/jayzelenkov.com/Production?logo=vercel&label=vercel)](https://vercel.com/jayzelenkovapps/jayzelenkov/deployments)
 
-Personal blog built with [Eleventy](https://www.11ty.dev/). Hosted on [Netlify](https://www.netlify.com/).
+Personal blog built with [Eleventy](https://www.11ty.dev/). Hosted on [Vercel](https://vercel.com/).
 
 ## Setup
 
