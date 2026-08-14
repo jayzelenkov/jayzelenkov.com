@@ -1,8 +1,11 @@
 (function () {
   var INTERVAL_MS = 10000;
+  var MAX_MS = 30 * 60 * 1000;
   var path = location.pathname;
-  var pageviewId = readCookie("pv");
+  var id = readCookie("pv");
   var timer = null;
+  var duration = 0;
+  var startAt = 0;
 
   function readCookie(name) {
     var match = document.cookie.match(
@@ -15,14 +18,51 @@
     return document.visibilityState === "visible";
   }
 
-  function ping() {
-    if (!pageviewId || !visible()) {
+  function pageviewId() {
+    if (!id) {
+      id = readCookie("pv");
+    }
+    return id;
+  }
+
+  function begin() {
+    if (!startAt && visible()) {
+      startAt = Date.now();
+    }
+  }
+
+  function pause() {
+    if (startAt) {
+      duration += Date.now() - startAt;
+      startAt = 0;
+    }
+  }
+
+  function ping(force) {
+    var pageviewIdValue = pageviewId();
+    if (!pageviewIdValue || (!force && !visible())) {
       return;
     }
-    var body = JSON.stringify({ id: pageviewId, path: path });
+    pause();
+    var ms = Math.min(Math.round(duration), MAX_MS);
+    if (visible()) {
+      begin();
+    }
+    var body = JSON.stringify({
+      id: pageviewIdValue,
+      path: path,
+      duration_ms: ms,
+    });
+    var url =
+      "/_ping?id=" +
+      encodeURIComponent(pageviewIdValue) +
+      "&path=" +
+      encodeURIComponent(path) +
+      "&duration_ms=" +
+      ms;
     var blob = new Blob([body], { type: "application/json" });
-    if (!navigator.sendBeacon || !navigator.sendBeacon("/_ping", blob)) {
-      fetch("/_ping", {
+    if (!navigator.sendBeacon || !navigator.sendBeacon(url, blob)) {
+      fetch(url, {
         method: "POST",
         body: body,
         headers: { "Content-Type": "application/json" },
@@ -32,9 +72,10 @@
   }
 
   function start() {
-    if (timer || !visible() || !pageviewId) {
+    if (timer || !visible() || !pageviewId()) {
       return;
     }
+    begin();
     ping();
     timer = setInterval(ping, INTERVAL_MS);
   }
@@ -44,6 +85,7 @@
       clearInterval(timer);
       timer = null;
     }
+    ping(true);
   }
 
   document.addEventListener("visibilitychange", function () {
