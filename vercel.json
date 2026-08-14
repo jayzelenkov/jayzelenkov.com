@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "eleventy",
+  "buildCommand": "npm run build",
+  "outputDirectory": "_site"
+}
