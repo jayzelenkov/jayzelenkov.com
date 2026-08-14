@@ -5,6 +5,7 @@ export const config = {
 };
 
 const PAGEVIEW_COOKIE = "pv";
+const MAX_DURATION_MS = 30 * 60 * 1000;
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -75,6 +76,7 @@ async function recordPageview(request, pageviewId) {
 }
 
 // Visible-tab heartbeats every 10s. Time on path ≈ ping count * 10.
+// duration_ms on the matching pageview is engaged visible time.
 // Active now: created_at > now() - interval '20 seconds'
 // Inactive/bounce: pageviews with no matching pings.
 async function recordPing(request) {
@@ -88,15 +90,23 @@ async function recordPing(request) {
     return;
   }
 
-  let payload;
+  const url = new URL(request.url);
+  let payload = {};
   try {
-    payload = JSON.parse(await request.text());
+    const text = await request.text();
+    if (text) {
+      payload = JSON.parse(text);
+    }
   } catch {
-    return;
+    payload = {};
   }
 
-  const pageviewId = payload.id || cookieValue(request, PAGEVIEW_COOKIE);
-  const path = payload.path;
+  const pageviewId =
+    payload.id || url.searchParams.get("id") || cookieValue(request, PAGEVIEW_COOKIE);
+  const path = payload.path || url.searchParams.get("path");
+  const durationMs = parseDuration(
+    payload.duration_ms ?? url.searchParams.get("duration_ms")
+  );
   if (
     !UUID_RE.test(pageviewId || "") ||
     typeof path !== "string" ||
@@ -108,7 +118,23 @@ async function recordPing(request) {
   }
 
   const userAgent = request.headers.get("user-agent");
+  const visitorHash = await hashVisitor(ipAddress(request), userAgent);
 
+  await Promise.all([
+    insertPing(supabase, pageviewId, path, visitorHash),
+    updateDuration(supabase, pageviewId, durationMs),
+  ]);
+}
+
+function parseDuration(value) {
+  if (value == null || value === "") {
+    return null;
+  }
+  const durationMs = typeof value === "number" ? value : Number.parseInt(value, 10);
+  return Number.isInteger(durationMs) ? durationMs : null;
+}
+
+async function insertPing(supabase, pageviewId, path, visitorHash) {
   try {
     const response = await fetch(`${supabase.url}/rest/v1/pings`, {
       method: "POST",
@@ -116,15 +142,60 @@ async function recordPing(request) {
       body: JSON.stringify({
         pageview_id: pageviewId,
         path,
-        visitor_hash: await hashVisitor(ipAddress(request), userAgent),
+        visitor_hash: visitorHash,
       }),
     });
 
     if (!response.ok) {
-      console.error("ping insert failed", response.status);
+      console.error("ping insert failed", response.status, await response.text());
     }
   } catch (error) {
     console.error("ping insert failed", error);
+  }
+}
+
+async function updateDuration(supabase, pageviewId, durationMs) {
+  if (
+    durationMs == null ||
+    durationMs < 1000 ||
+    durationMs > MAX_DURATION_MS
+  ) {
+    return;
+  }
+
+  for (let attempt = 0; attempt < 4; attempt++) {
+    try {
+      const response = await fetch(
+        `${supabase.url}/rest/v1/pageviews?pageview_id=eq.${pageviewId}&or=(duration_ms.is.null,duration_ms.lt.${durationMs})`,
+        {
+          method: "PATCH",
+          headers: {
+            ...supabase.headers,
+            Prefer: "return=representation",
+          },
+          body: JSON.stringify({ duration_ms: durationMs }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error(
+          "pageview duration update failed",
+          response.status,
+          await response.text()
+        );
+        return;
+      }
+
+      const rows = await response.json();
+      if (Array.isArray(rows) && rows.length > 0) {
+        return;
+      }
+    } catch (error) {
+      console.error("pageview duration update failed", error);
+      return;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 200 * (attempt + 1)));
   }
 }
 
