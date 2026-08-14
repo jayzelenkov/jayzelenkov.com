@@ -1,4 +1,4 @@
-import { geolocation, next } from "@vercel/functions";
+import { geolocation, ipAddress, next } from "@vercel/functions";
 
 export const config = {
   matcher: ["/((?!.*\\..*).*)"],
@@ -29,6 +29,7 @@ async function recordPageview(request) {
   }
 
   const { country, city } = geolocation(request);
+  const userAgent = request.headers.get("user-agent");
 
   try {
     const response = await fetch(`${supabaseUrl}/rest/v1/pageviews`, {
@@ -44,7 +45,8 @@ async function recordPageview(request) {
         referrer: request.headers.get("referer"),
         country: country || null,
         city: city || null,
-        user_agent: request.headers.get("user-agent"),
+        user_agent: userAgent,
+        visitor_hash: await hashVisitor(ipAddress(request), userAgent),
       }),
     });
 
@@ -54,4 +56,20 @@ async function recordPageview(request) {
   } catch (error) {
     console.error("pageview insert failed", error);
   }
+}
+
+async function hashVisitor(ip, userAgent) {
+  if (!ip) {
+    return null;
+  }
+
+  const salt = process.env.VISITOR_HASH_SALT || "";
+  const bytes = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(`${salt}|${ip}|${userAgent || ""}`)
+  );
+
+  return Array.from(new Uint8Array(bytes), (byte) =>
+    byte.toString(16).padStart(2, "0")
+  ).join("");
 }
