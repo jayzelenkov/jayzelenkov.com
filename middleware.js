@@ -4,18 +4,34 @@ export const config = {
   matcher: ["/((?!.*\\..*).*)"],
 };
 
-export default function middleware(request, context) {
+const PAGEVIEW_COOKIE = "pv";
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export default async function middleware(request, context) {
+  const url = new URL(request.url);
+
+  if (request.method === "POST" && url.pathname === "/_ping") {
+    await recordPing(request);
+    return new Response(null, { status: 204 });
+  }
+
   if (request.method === "GET") {
-    context.waitUntil(recordPageview(request));
+    const pageviewId = crypto.randomUUID();
+    context.waitUntil(recordPageview(request, pageviewId));
+    return next({
+      headers: {
+        "Set-Cookie": `${PAGEVIEW_COOKIE}=${pageviewId}; Path=/; Max-Age=1800; SameSite=Lax; Secure`,
+      },
+    });
   }
 
   return next();
 }
 
-async function recordPageview(request) {
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !serviceRoleKey) {
+async function recordPageview(request, pageviewId) {
+  const supabase = supabaseConfig();
+  if (!supabase) {
     return;
   }
 
@@ -33,14 +49,9 @@ async function recordPageview(request) {
   const { isCrawler, isLlm, botName } = classifyRequest(request);
 
   try {
-    const response = await fetch(`${supabaseUrl}/rest/v1/pageviews`, {
+    const response = await fetch(`${supabase.url}/rest/v1/pageviews`, {
       method: "POST",
-      headers: {
-        apikey: serviceRoleKey,
-        Authorization: `Bearer ${serviceRoleKey}`,
-        "Content-Type": "application/json",
-        Prefer: "return=minimal",
-      },
+      headers: supabase.headers,
       body: JSON.stringify({
         path: url.pathname,
         referrer: request.headers.get("referer"),
@@ -51,6 +62,7 @@ async function recordPageview(request) {
         is_crawler: isCrawler,
         is_llm: isLlm,
         bot_name: botName,
+        pageview_id: pageviewId,
       }),
     });
 
@@ -60,6 +72,84 @@ async function recordPageview(request) {
   } catch (error) {
     console.error("pageview insert failed", error);
   }
+}
+
+// Visible-tab heartbeats every 10s. Time on path ≈ ping count * 10.
+// Active now: created_at > now() - interval '20 seconds'
+// Inactive/bounce: pageviews with no matching pings.
+async function recordPing(request) {
+  const supabase = supabaseConfig();
+  if (!supabase) {
+    return;
+  }
+
+  const { isCrawler, isLlm } = classifyRequest(request);
+  if (isCrawler || isLlm) {
+    return;
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(await request.text());
+  } catch {
+    return;
+  }
+
+  const pageviewId = payload.id || cookieValue(request, PAGEVIEW_COOKIE);
+  const path = payload.path;
+  if (
+    !UUID_RE.test(pageviewId || "") ||
+    typeof path !== "string" ||
+    !path.startsWith("/") ||
+    path.length > 512 ||
+    /[?\s]/.test(path)
+  ) {
+    return;
+  }
+
+  const userAgent = request.headers.get("user-agent");
+
+  try {
+    const response = await fetch(`${supabase.url}/rest/v1/pings`, {
+      method: "POST",
+      headers: supabase.headers,
+      body: JSON.stringify({
+        pageview_id: pageviewId,
+        path,
+        visitor_hash: await hashVisitor(ipAddress(request), userAgent),
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("ping insert failed", response.status);
+    }
+  } catch (error) {
+    console.error("ping insert failed", error);
+  }
+}
+
+function supabaseConfig() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    return null;
+  }
+
+  return {
+    url,
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+  };
+}
+
+function cookieValue(request, name) {
+  const cookie = request.headers.get("cookie") || "";
+  const match = cookie.match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`));
+  return match ? match[1] : null;
 }
 
 async function hashVisitor(ip, userAgent) {
